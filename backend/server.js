@@ -21,11 +21,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(
   // "http://localhost:5173"
-  //"https://class-room-frontend.vercel.app"
 
   
   cors({
-    origin: ["https://class-room-frontend-mtexrfroz-sarvagya-singhs-projects.vercel.app"],
+    origin: ["https://class-room-frontend-mtexrfroz-sarvagya-singhs-projects.vercel.app","https://class-room-frontend.vercel.app"],
     credentials:true,
   })
 );
