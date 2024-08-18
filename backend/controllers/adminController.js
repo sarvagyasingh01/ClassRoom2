@@ -331,7 +331,7 @@ const deleteClass = asyncHandler(async (req, res) => {
       } else {
         await Student.updateMany(
           { classroom: id },
-          { $set: { classroom: undefined } }
+          { $set: { classroom: undefined, classroomName:undefined } }
         );
         const teacher = await Teacher.findById(classroom.teacher);
         if (teacher) {
