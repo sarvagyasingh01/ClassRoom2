@@ -304,19 +304,47 @@ const deleteClass = asyncHandler(async (req, res) => {
   try {
     // Check if the class has a teacher assigned
     if (!classroom.teacher) {
+      const students = await Student.find({ classroom: id });
+      if (students.length == 0) {
+        await Classroom.findByIdAndDelete(id);
+        res.status(200).json({ message: "Classroom deleted successfully" });
+      } else {
+        await Student.updateMany(
+          { classroom: id },
+          { $set: { classroom: undefined } }
+        );
+        await Classroom.findByIdAndDelete(id);
+        res.status(200).json({ message: "Classroom deleted successfully" });
+      }
+
       // If no teacher is assigned, delete the class directly
       await Classroom.findByIdAndDelete(id);
       res.status(200).json({ message: "Classroom deleted successfully" });
     } else {
-      // If a teacher is assigned, remove the teacher assignment before deleting
-      const teacher = await Teacher.findById(classroom.teacher);
-      if (teacher) {
-        teacher.classroom = undefined;
-        teacher.className = undefined;
-        teacher.save();
+      const students = await Student.find({ classroom: id });
+      if (students.length == 0) {
+        const teacher = await Teacher.findById(classroom.teacher);
+        if (teacher) {
+          teacher.classroom = undefined;
+          teacher.className = undefined;
+          teacher.save();
+        }
+        await Classroom.findByIdAndDelete(id);
+        res.status(200).json({ message: "Classroom deleted successfully" });
+      } else {
+        await Student.updateMany(
+          { classroom: id },
+          { $set: { classroom: undefined } }
+        );
+        const teacher = await Teacher.findById(classroom.teacher);
+        if (teacher) {
+          teacher.classroom = undefined;
+          teacher.className = undefined;
+          teacher.save();
+        }
+        await Classroom.findByIdAndDelete(id);
+        res.status(200).json({ message: "Classroom deleted successfully" });
       }
-      await Classroom.findByIdAndDelete(id);
-      res.status(200).json({ message: "Classroom deleted successfully" });
     }
   } catch (error) {
     res.status(500);
@@ -495,7 +523,7 @@ const getTeachers = asyncHandler(async (req, res) => {
     throw new Error("Not Authorized!");
   }
   try {
-    const teachers = await Teacher.find().select('-password');
+    const teachers = await Teacher.find().select("-password");
     res.status(200).json(teachers);
   } catch (error) {
     res.status(400);
@@ -510,7 +538,7 @@ const getStudents = asyncHandler(async (req, res) => {
     throw new Error("Not Authorized!");
   }
   try {
-    const students = await Student.find().select('-password');
+    const students = await Student.find().select("-password");
     res.status(200).json(students);
   } catch (error) {
     res.status(400);
@@ -544,8 +572,8 @@ const getType = asyncHandler(async (req, res) => {
 
     //Verify token
     const verified = jwt.verify(token, process.env.JWT_SECRET);
-    const type = verified.type
-    res.status(200).json({type})
+    const type = verified.type;
+    res.status(200).json({ type });
   } catch (error) {
     res.status(401);
     throw new Error("Not authorized, please login");
@@ -553,9 +581,9 @@ const getType = asyncHandler(async (req, res) => {
 });
 
 const logOut = async (req, res) => {
-  res.clearCookie("token")
-  res.status(200).json({message: "Logged out successfully!"})
-}
+  res.clearCookie("token");
+  res.status(200).json({ message: "Logged out successfully!" });
+};
 
 module.exports = {
   registerPrincipal,
@@ -574,5 +602,5 @@ module.exports = {
   getStudents,
   getClassrooms,
   getType,
-  logOut
+  logOut,
 };
