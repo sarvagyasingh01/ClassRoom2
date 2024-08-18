@@ -317,9 +317,6 @@ const deleteClass = asyncHandler(async (req, res) => {
         res.status(200).json({ message: "Classroom deleted successfully" });
       }
 
-      // If no teacher is assigned, delete the class directly
-      await Classroom.findByIdAndDelete(id);
-      res.status(200).json({ message: "Classroom deleted successfully" });
     } else {
       const students = await Student.find({ classroom: id });
       if (students.length == 0) {
