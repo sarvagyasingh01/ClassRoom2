@@ -2,20 +2,20 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 export const URL = import.meta.env.VITE_APP_BACKEND_URL;
 import { ToastContainer, toast } from "react-toastify";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 
 const Login = () => {
   const [selectedRole, setSelectedRole] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
     if (!email || !password) {
       return toast.error("Fill all the fields");
     }
-    
+
     try {
       const res = await axios.post(
         `${URL}/api/${selectedRole}/login`,
@@ -26,16 +26,15 @@ const Login = () => {
         { withCredentials: true }
       );
       navigate("/dashboard");
-      navigate(0)
+      navigate(0);
     } catch (error) {
-      toast.error(error.response.data.message)
+      toast.error(error.response.data.message);
     }
-    
   };
 
   return (
     <>
-      <ToastContainer/>
+      <ToastContainer />
       <div className="min-h-[650px] flex items-center justify-center bg-[#E4F0F1]">
         <div className="bg-white p-8 rounded-lg shadow-2xl max-w-md w-full">
           <h1 className="text-2xl font-semibold text-center text-[#457b9d] mb-6">
@@ -109,6 +108,11 @@ const Login = () => {
           >
             Login
           </button>
+          <div className="text-sm text-center text-bold mt-4 text-slate-400">
+            For Admin :-
+            <div className="mt-1">Email : principal@classroom.com</div>
+            <div className="mt-1">Password : Admin</div>
+          </div>
         </div>
       </div>
     </>
